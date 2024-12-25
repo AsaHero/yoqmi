@@ -5,6 +5,7 @@ import Header from './Header';
 import { Home, Settings, Users, LogOut } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useUser } from '../../contexts/UserContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 const AppLayout = ({ children }) => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
@@ -12,6 +13,7 @@ const AppLayout = ({ children }) => {
   const location = useLocation();
   const { t } = useTranslation();
   const { state: { user } } = useUser();
+  const { logout } = useAuth();
 
   const menuItems = [
     { icon: <Home className="w-5 h-5" />, label: t('navigation.home'), path: '/' },
@@ -22,6 +24,11 @@ const AppLayout = ({ children }) => {
   const handleNavigation = (path) => {
     navigate(path);
     setIsSideMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -47,8 +54,8 @@ const AppLayout = ({ children }) => {
           <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center">
             <span className="text-3xl">👤</span>
           </div>
-          <h2 className="text-center font-semibold">John Doe</h2>
-          <p className="text-center text-sm opacity-80">john@example.com</p>
+          <h2 className="text-center font-semibold">{user.name}</h2>
+          <p className="text-center text-sm opacity-80">{user.email}</p>
         </div>
 
         {/* Menu Items */}
@@ -73,7 +80,7 @@ const AppLayout = ({ children }) => {
 
           {/* Sign Out Button */}
           <button
-            onClick={() => {/* Handle sign out */}}
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 text-left text-red-600 dark:text-red-400
                      hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors mt-4"
           >

@@ -1,6 +1,8 @@
 // src/contexts/UserContext.jsx
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { userService } from '../services/userService';
+import { useNotifications } from './NotificationsContext';
 
 const UserContext = createContext(null);
 
@@ -9,13 +11,14 @@ const ACTIONS = {
     UPDATE_USER: 'UPDATE_USER',
     SET_LOADING: 'SET_LOADING',
     SET_ERROR: 'SET_ERROR',
+    UPDATE_PREFERENCES: 'UPDATE_PREFERENCES'
 };
 
 const initialState = {
     user: null,
     preferences: {
-        language: 'en',  // Default language
-        darkMode: false, // Default theme
+        language: 'en',
+        darkMode: false
     },
     isLoading: false,
     error: null,
@@ -49,6 +52,13 @@ function userReducer(state, action) {
                 error: action.payload,
                 isLoading: false,
             };
+        case ACTIONS.UPDATE_PREFERENCES:
+            return {
+                ...state,
+                preferences: { ...state.preferences, ...action.payload },
+                isLoading: false,
+                error: null,
+            };
         default:
             return state;
     }
@@ -57,51 +67,72 @@ function userReducer(state, action) {
 export function UserProvider({ children }) {
     const [state, dispatch] = useReducer(userReducer, initialState);
     const { state: authState } = useAuth();
+    const { addNotification } = useNotifications();
 
-    // Load saved preferences
+    // Load user profile when auth state changes
     useEffect(() => {
-      const savedLanguage = localStorage.getItem('preferred-language');
-      const savedDarkMode = localStorage.getItem('dark-mode') === 'true';
-
-      if (savedLanguage || savedDarkMode) {
-        dispatch({
-          type: ACTIONS.SET_USER,
-          payload: {
-            ...state.user,
-            preferences: {
-              language: savedLanguage || state.preferences.language,
-              darkMode: savedDarkMode
+        const loadUserProfile = async () => {
+            if (authState.user && !state.user) {
+                try {
+                    dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+                    const profile = await userService.getProfile();
+                    dispatch({ type: ACTIONS.SET_USER, payload: profile });
+                } catch (error) {
+                    dispatch({
+                        type: ACTIONS.SET_ERROR,
+                        payload: error.message || 'Failed to load user profile'
+                    });
+                    addNotification({
+                        type: 'error',
+                        message: error.message || 'Failed to load user profile'
+                    });
+                }
             }
-          }
-        });
-      }
-    }, []);
+        };
 
-    // Update user when auth state changes
-    useEffect(() => {
-        if (authState.user) {
-            dispatch({ type: ACTIONS.SET_USER, payload: authState.user });
-        }
+        loadUserProfile();
     }, [authState.user]);
+
+    // Load saved preferences from localStorage
+    useEffect(() => {
+        const savedLanguage = localStorage.getItem('preferred-language');
+        const savedDarkMode = localStorage.getItem('dark-mode') === 'true';
+
+        if (savedLanguage || savedDarkMode !== null) {
+            dispatch({
+                type: ACTIONS.UPDATE_PREFERENCES,
+                payload: {
+                    language: savedLanguage || state.preferences.language,
+                    darkMode: savedDarkMode
+                }
+            });
+        }
+    }, []);
 
     const updateUser = async (updates) => {
         try {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-            // TODO: API call to update user
-            dispatch({ type: ACTIONS.UPDATE_USER, payload: updates });
+            const updatedUser = await userService.updateProfile(updates);
+            dispatch({ type: ACTIONS.UPDATE_USER, payload: updatedUser });
+            addNotification({
+                type: 'success',
+                message: 'Profile updated successfully'
+            });
         } catch (error) {
             dispatch({
                 type: ACTIONS.SET_ERROR,
-                payload: 'Failed to update user information'
+                payload: error.message || 'Failed to update user information'
+            });
+            addNotification({
+                type: 'error',
+                message: error.message || 'Failed to update user information'
             });
         }
     };
 
     const updatePreferences = async (newPreferences) => {
         try {
-            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-
-            // Save to localStorage
+            // Save to localStorage only
             if (newPreferences.language) {
                 localStorage.setItem('preferred-language', newPreferences.language);
             }
@@ -110,16 +141,62 @@ export function UserProvider({ children }) {
             }
 
             dispatch({
-                type: ACTIONS.SET_USER,
-                payload: {
-                    ...state.user,
-                    preferences: { ...state.preferences, ...newPreferences }
-                }
+                type: ACTIONS.UPDATE_PREFERENCES,
+                payload: newPreferences
+            });
+
+            addNotification({
+                type: 'success',
+                message: 'Preferences updated successfully'
             });
         } catch (error) {
             dispatch({
                 type: ACTIONS.SET_ERROR,
-                payload: 'Failed to update preferences'
+                payload: error.message || 'Failed to update preferences'
+            });
+            addNotification({
+                type: 'error',
+                message: error.message || 'Failed to update preferences'
+            });
+        }
+    };
+
+    const changePassword = async (currentPassword, newPassword) => {
+        try {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+            await userService.changePassword(currentPassword, newPassword);
+            addNotification({
+                type: 'success',
+                message: 'Password changed successfully'
+            });
+        } catch (error) {
+            dispatch({
+                type: ACTIONS.SET_ERROR,
+                payload: error.message || 'Failed to change password'
+            });
+            addNotification({
+                type: 'error',
+                message: error.message || 'Failed to change password'
+            });
+        }
+    };
+
+    const deleteAccount = async (password) => {
+        try {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+            await userService.deleteAccount(password);
+            addNotification({
+                type: 'success',
+                message: 'Account deleted successfully'
+            });
+        } catch (error) {
+            dispatch({
+                type: ACTIONS.SET_ERROR,
+                payload: error.message || 'Failed to delete account'
+            });
+            addNotification({
+                type: 'error',
+                message: error.message || 'Failed to delete account'
             });
         }
     };
@@ -130,6 +207,8 @@ export function UserProvider({ children }) {
                 state,
                 updateUser,
                 updatePreferences,
+                changePassword,
+                deleteAccount
             }}
         >
             {children}
