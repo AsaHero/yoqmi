@@ -14,6 +14,7 @@ import { ShoppingProvider } from './contexts/ShoppingContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 import Notifications from './components/Notifications';
+import PWAPrompt from './components/PWAPrompt';
 
 // Auth Pages
 import Login from './pages/Login';
@@ -66,6 +67,7 @@ function App() {
               {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
             </Routes>
             <Notifications />
+            <PWAPrompt />
           </UserProvider>
         </AuthProvider>
       </NotificationsProvider>

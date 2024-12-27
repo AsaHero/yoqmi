@@ -50,7 +50,9 @@ function shoppingReducer(state, action) {
     case ACTIONS.ADD_ITEM:
       return {
         ...state,
-        items: [...state.items, action.payload],
+        items: state.items.find(i => i.id === action.payload.id)
+          ? state.items
+          : [...state.items, action.payload],
         isLoading: false,
         error: null,
       };
@@ -109,9 +111,7 @@ export function ShoppingProvider({ children }) {
     };
 
     const handleItemAdded = (item) => {
-      if (!state.items.find(i => i.id === item.id)) {
-        dispatch({ type: ACTIONS.ADD_ITEM, payload: item });
-      }
+      dispatch({ type: ACTIONS.ADD_ITEM, payload: item });
     };
 
     const handleItemUpdated = (item) => {

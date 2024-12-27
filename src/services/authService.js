@@ -4,18 +4,12 @@ const API_URL = 'http://localhost:8080/api';
 export const authService = {
   async signup(data) {
     // Create form data for file upload
-    const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (key === 'avatar' && data[key]) {
-        formData.append('avatar', data[key]);
-      } else {
-        formData.append(key, data[key]);
-      }
-    });
-
     const response = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -66,18 +60,10 @@ export const authService = {
   },
 
   async joinFamily(data) {
-    const formData = new FormData();
-    Object.keys(data).forEach(key => {
-      if (key === 'avatar' && data[key]) {
-        formData.append('avatar', data[key]);
-      } else {
-        formData.append(key, data[key]);
-      }
-    });
-
-    const response = await fetch(`${API_URL}/auth/join`, {
+    const response = await fetch(`${API_URL}/auth/families/join`, {
       method: 'POST',
-      body: formData,
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -86,16 +72,25 @@ export const authService = {
     }
 
     const result = await response.json();
-    localStorage.setItem('auth_token', result.token);
+    console.log(result);
+
+    // If this was a new user registration (we got a token back)
+    if (result.token) {
+      localStorage.setItem('auth_token', result.token);
+    }
+
     return result;
   },
 
   async validateInvite(code) {
-    const response = await fetch(`${API_URL}/invite/${code}/validate`);
+    const response = await fetch(`${API_URL}/auth/invites/${code}/validate`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Invalid invite code');
+      throw new Error(error.message || 'Failed to validate invite');
     }
 
     return response.json();
@@ -128,5 +123,18 @@ export const authService = {
 
   getToken() {
     return localStorage.getItem('auth_token');
+  },
+
+  getHeaders() {
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+
+    const token = this.getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return headers;
   }
 };

@@ -6,13 +6,14 @@ import { Home, Settings, Users, LogOut } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useUser } from '../../contexts/UserContext';
 import { useAuth } from '../../contexts/AuthContext';
+import LoadingSpinner from '../ui/LoadingSpinner';
 
 const AppLayout = ({ children }) => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const { state: { user } } = useUser();
+  const { state: { user, isLoading } } = useUser();
   const { logout } = useAuth();
 
   const menuItems = [
@@ -50,13 +51,19 @@ const AppLayout = ({ children }) => {
         ${isSideMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* User Info */}
-        <div className="bg-primary p-6 text-white">
-          <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center">
-            <span className="text-3xl">👤</span>
+        {isLoading ? (
+          <div className="bg-primary p-6 text-white flex items-center justify-center">
+            <LoadingSpinner size="medium" className="text-white" />
           </div>
-          <h2 className="text-center font-semibold">{user.name}</h2>
-          <p className="text-center text-sm opacity-80">{user.email}</p>
-        </div>
+        ) : user ? (
+          <div className="bg-primary p-6 text-white">
+            <div className="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center">
+              <span className="text-3xl">👤</span>
+            </div>
+            <h2 className="text-center font-semibold">{user.name}</h2>
+            <p className="text-center text-sm opacity-80">{user.email}</p>
+          </div>
+        ) : null}
 
         {/* Menu Items */}
         <nav className="p-4">

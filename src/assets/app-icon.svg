@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#4F46E5" rx="100"/>
+
+  <!-- Shopping List Paper -->
+  <rect x="128" y="96" width="256" height="320" fill="white" rx="20"/>
+
+  <!-- List Lines -->
+  <rect x="160" y="160" width="160" height="8" fill="#4F46E5" rx="4"/>
+  <rect x="160" y="200" width="192" height="8" fill="#4F46E5" rx="4"/>
+  <rect x="160" y="240" width="144" height="8" fill="#4F46E5" rx="4"/>
+
+  <!-- Checkmarks -->
+  <path d="M160 320 L180 340 L220 300" stroke="#22C55E" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M160 380 L180 400 L220 360" stroke="#22C55E" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

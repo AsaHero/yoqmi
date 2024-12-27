@@ -9,6 +9,7 @@ const ACTIONS = {
   SET_ERROR: 'SET_ERROR',
   SET_USER: 'SET_USER',
   LOGOUT: 'LOGOUT',
+  UPDATE_USER: 'UPDATE_USER'
 };
 
 const initialState = {
@@ -37,6 +38,16 @@ function authReducer(state, action) {
         ...state,
         user: action.payload,
         isAuthenticated: !!action.payload,
+        isLoading: false,
+        error: null,
+      };
+    case ACTIONS.UPDATE_USER:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          ...action.payload,
+        },
         isLoading: false,
         error: null,
       };
@@ -93,12 +104,37 @@ export function AuthProvider({ children }) {
   const joinFamily = async (data) => {
     try {
       dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-      const response = await authService.joinFamily(data);
-      dispatch({ type: ACTIONS.SET_USER, payload: response.user });
+      console.log(data);
+      
+      const response = await authService.joinFamily({
+        inviteCode: data.inviteCode,
+        ...(state.user ? { userId: state.user.id } : {
+          name: data.name,
+          email: data.email,
+          password: data.password
+        })
+      });
+
+      if (response.user) {
+        // New user case - set full user data and auth state
+        dispatch({ type: ACTIONS.SET_USER, payload: response.user });
+      } else {
+        // Existing user case - update families/members lists
+        dispatch({
+          type: ACTIONS.UPDATE_USER,
+          payload: {
+            families: [...(state.user?.families || []), response.familyId],
+            members: [...(state.user?.members || []), response.memberId]
+          }
+        });
+      }
+
       return response;
     } catch (error) {
       dispatch({ type: ACTIONS.SET_ERROR, payload: error.message });
       throw error;
+    } finally {
+      dispatch({ type: ACTIONS.SET_LOADING, payload: false });
     }
   };
 

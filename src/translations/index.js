@@ -12,6 +12,7 @@ export const translations = {
             confirm: 'Confirm',
             success: 'Success',
             or: 'or',
+            back: "<- Back"
         },
 
         // Authentication
@@ -31,7 +32,7 @@ export const translations = {
             noAccount: `Don't have an account?`,
             alreadyHaveAccount: 'Already have an account?',
             createFamilyDesc: 'Create a new family account to start managing your shopping lists',
-            joiningFamily: 'Joining {{name}} family',
+            joiningFamily: 'Joining {name} family',
             loginError: 'Invalid email or password',
             signupSuccess: 'Account created successfully',
             joinSuccess: 'Joined family successfully',
@@ -164,6 +165,7 @@ export const translations = {
             confirm: 'Подтвердить',
             success: 'Успешно',
             or: 'или',
+            back: "<- Назад"
         },
 
         // Authentication
@@ -183,7 +185,7 @@ export const translations = {
             noAccount: 'Нет аккаунта?',
             alreadyHaveAccount: 'Уже есть аккаунт?',
             createFamilyDesc: 'Создайте новый семейный аккаунт для управления списками покупок',
-            joiningFamily: 'Присоединение к семье {{name}}',
+            joiningFamily: 'Присоединение к семье {name}',
             loginError: 'Неверный email или пароль',
             signupSuccess: 'Аккаунт успешно создан',
             joinSuccess: 'Успешное присоединение к семье',
@@ -316,6 +318,7 @@ export const translations = {
             confirm: 'Tasdiqlash',
             success: 'Muvaffaqiyatli',
             or: 'yoki',
+            back: "<- Orkaga"
         },
 
         // Authentication
@@ -335,7 +338,7 @@ export const translations = {
             noAccount: `Hisobingiz yo'qmi?`,
             alreadyHaveAccount: 'Hisobingiz bormi?',
             createFamilyDesc: `Xarid ro'yxatlarini boshqarish uchun yangi oilaviy hisob yarating`,
-            joiningFamily: `{{name}} oilasiga qo'shilish`,
+            joiningFamily: `{name} oilasiga qo'shilish`,
             loginError: `Noto'g'ri email yoki parol`,
             signupSuccess: `Hisob muvaffaqiyatli yaratildi`,
             joinSuccess: `Oilaga muvaffaqiyatli qo'shildingiz`,

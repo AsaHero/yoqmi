@@ -34,20 +34,6 @@ export const familyService = {
         return response.json();
     },
 
-    // Validate invite code
-    async validateInvite(code) {
-        const token = authService.getToken();
-        const response = await fetch(`${API_URL}/family/invite/${code}/validate`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Invalid invite code');
-        }
-        return response.json();
-    },
-
     // Remove member
     async removeMember(memberId) {
         const token = authService.getToken();

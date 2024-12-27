@@ -7,7 +7,7 @@ export const userService = {
   // Get user profile
   async getProfile() {
     const token = authService.getToken();
-    const response = await fetch(`${API_URL}/users/profile`, {
+    const response = await fetch(`${API_URL}/auth/me`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

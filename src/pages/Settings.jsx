@@ -12,13 +12,23 @@ const LANGUAGES = [
 ];
 
 const Settings = () => {
-  const { state: { user, isLoading, error }, updateUser, updatePreferences } = useUser();
+  const { state: { user, preferences, isLoading, error }, updateUser, updatePreferences } = useUser();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('profile');
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
+    name: '',
+    email: '',
   });
+
+  // Update form data when user data becomes available
+  React.useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+      });
+    }
+  }, [user]);
 
   const tabs = [
     { id: 'profile', label: t('settings.profile'), icon: User },
@@ -31,27 +41,22 @@ const Settings = () => {
   };
 
   const handleLanguageChange = async (e) => {
-    const newLanguage = e.target.value;
-    localStorage.setItem('preferred-language', newLanguage);
-    await updatePreferences({ language: e.target.value });
+    await updatePreferences({ language:  e.target.value});
   };
 
   const handleDarkModeToggle = async () => {
-    const newDarkMode = !user?.preferences?.darkMode;
-
-    localStorage.setItem('dark-mode', newDarkMode.toString());
-
-    document.documentElement.classList.toggle('dark');
-    await updatePreferences({ darkMode: newDarkMode });
+    await updatePreferences({ darkMode: !preferences?.darkMode });
   };
 
-  if (!user) {
+  // Show loading spinner when loading or no user
+  if (isLoading || !user) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <LoadingSpinner size="large" />
       </div>
     );
   }
+
 
   return (
     <div className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -164,7 +169,7 @@ const Settings = () => {
                 {t('settings.language')}
               </label>
               <select
-                value={user.preferences?.language}
+                value={preferences?.language}
                 onChange={handleLanguageChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600
                          bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
@@ -188,13 +193,13 @@ const Settings = () => {
                 <button
                   type="button"
                   role="switch"
-                  aria-checked={user.preferences?.darkMode}
+                  aria-checked={preferences?.darkMode}
                   onClick={handleDarkModeToggle}
                   className={`
                     relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full
                     border-2 border-transparent transition-colors duration-200 ease-in-out
                     focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                    ${user.preferences?.darkMode ? 'bg-primary' : 'bg-gray-200'}
+                    ${preferences?.darkMode ? 'bg-primary' : 'bg-gray-200'}
                   `}
                 >
                   <span className="sr-only">{t('settings.darkMode')}</span>
@@ -203,7 +208,7 @@ const Settings = () => {
                     className={`
                       pointer-events-none inline-block h-5 w-5 transform rounded-full
                       bg-white shadow ring-0 transition duration-200 ease-in-out
-                      ${user.preferences?.darkMode ? 'translate-x-5' : 'translate-x-0'}
+                      ${preferences?.darkMode ? 'translate-x-5' : 'translate-x-0'}
                     `}
                   />
                 </button>

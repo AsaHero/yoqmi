@@ -5,7 +5,7 @@ import { useUser } from '../contexts/UserContext';
 
 export function useTranslation() {
   const { state } = useUser();
-  const language = state.user?.preferences?.language || 'en';
+  const language = state.preferences?.language || 'en';
 
   const t = useCallback((key, params = {}) => {
     // Split the key into parts (e.g., 'shopping.title' -> ['shopping', 'title'])

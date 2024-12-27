@@ -17,8 +17,8 @@ const ACTIONS = {
 const initialState = {
     user: null,
     preferences: {
-        language: 'en',
-        darkMode: false
+        language: navigator.language.split('-')[0] || 'en',
+        darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches
     },
     isLoading: false,
     error: null,
@@ -98,6 +98,13 @@ export function UserProvider({ children }) {
         const savedLanguage = localStorage.getItem('preferred-language');
         const savedDarkMode = localStorage.getItem('dark-mode') === 'true';
 
+        if (savedDarkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        console.log(savedDarkMode, savedLanguage)
         if (savedLanguage || savedDarkMode !== null) {
             dispatch({
                 type: ACTIONS.UPDATE_PREFERENCES,
@@ -132,11 +139,13 @@ export function UserProvider({ children }) {
 
     const updatePreferences = async (newPreferences) => {
         try {
-            // Save to localStorage only
+            // Then update localStorage and apply changes
             if (newPreferences.language) {
                 localStorage.setItem('preferred-language', newPreferences.language);
             }
+
             if (newPreferences.darkMode !== undefined) {
+                document.documentElement.classList.toggle('dark');
                 localStorage.setItem('dark-mode', newPreferences.darkMode.toString());
             }
 
@@ -144,6 +153,8 @@ export function UserProvider({ children }) {
                 type: ACTIONS.UPDATE_PREFERENCES,
                 payload: newPreferences
             });
+
+            console.log(newPreferences);
 
             addNotification({
                 type: 'success',
