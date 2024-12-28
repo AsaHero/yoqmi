@@ -10,10 +10,12 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Familist',
-        short_name: 'Familist',
-        description: 'Family Shopping List Application',
-        theme_color: '#ffffff',
+        name: 'YoqMi',
+        short_name: 'YoqMi',
+        description: 'Your family shopping list app',
+        theme_color: '#4F46E5', // Your primary color
+        background_color: '#4F46E5',
+        display: 'standalone',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -28,8 +30,6 @@ export default defineConfig({
           }
         ],
         start_url: '/',
-        display: 'standalone',
-        background_color: '#ffffff',
         orientation: 'portrait'
       },
       workbox: {

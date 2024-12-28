@@ -24,16 +24,22 @@ const Header = ({ onMenuClick }) => {
             <Menu className="h-6 w-6" />
           </button>
 
-          {/* Center: Title */}
-          <h1 className="text-xl font-semibold text-white flex-1 text-center">
-          {t('shopping.title')}
-            {!isConnected && (
-              <span className="ml-2 text-sm text-white/70">(Offline)</span>
-            )}
-          </h1>
+          {/* Center: Brand Title */}
+          <div className="flex-1 flex justify-center items-center">
+            <h1 className="text-xl flex items-center">
+              <span className="font-bold text-white">Yoq</span>
+              <span className="font-light text-white">Mi</span>
+              <span className="text-sm text-white/80">?</span>
+              {!isConnected && (
+                <span className="ml-2 text-sm text-white/70">(Offline)</span>
+              )}
+            </h1>
+          </div>
 
           {/* Right: Sync Status */}
-          <SyncStatus />
+          <div className="w-10"> {/* Fixed width to balance the menu button */}
+            <SyncStatus />
+          </div>
         </div>
       </div>
     </header>
