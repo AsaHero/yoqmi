@@ -1,15 +1,20 @@
 // src/services/authService.js
-const API_URL = 'http://localhost:8080/api';
+import { Config } from './config';
 
 export const authService = {
   async signup(data) {
     // Create form data for file upload
-    const response = await fetch(`${API_URL}/auth/signup`, {
+    const response = await fetch(`${Config.API_URL}/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        family_name: data.familyName
+      }),
     });
 
     if (!response.ok) {
@@ -19,12 +24,12 @@ export const authService = {
 
     const result = await response.json();
     // Store token
-    localStorage.setItem('auth_token', result.token);
+    localStorage.setItem('auth_token', result.access_token);
     return result;
   },
 
   async login(credentials) {
-    const response = await fetch(`${API_URL}/auth/login`, {
+    const response = await fetch(`${Config.API_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -38,12 +43,12 @@ export const authService = {
     }
 
     const result = await response.json();
-    localStorage.setItem('auth_token', result.token);
+    localStorage.setItem('auth_token', result.access_token);
     return result;
   },
 
   async resetPassword(email) {
-    const response = await fetch(`${API_URL}/auth/reset-password`, {
+    const response = await fetch(`${Config.API_URL}/auth/reset-password`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +65,7 @@ export const authService = {
   },
 
   async joinFamily(data) {
-    const response = await fetch(`${API_URL}/auth/families/join`, {
+    const response = await fetch(`${Config.API_URL}/auth/families/join`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(data),
@@ -75,15 +80,15 @@ export const authService = {
     console.log(result);
 
     // If this was a new user registration (we got a token back)
-    if (result.token) {
-      localStorage.setItem('auth_token', result.token);
+    if (result.access_token) {
+      localStorage.setItem('auth_token', result.access_token);
     }
 
     return result;
   },
 
   async validateInvite(code) {
-    const response = await fetch(`${API_URL}/auth/invites/${code}/validate`, {
+    const response = await fetch(`${Config.API_URL}/auth/invites/${code}/validate`, {
       method: 'GET',
       headers: this.getHeaders(),
     });
@@ -91,27 +96,6 @@ export const authService = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to validate invite');
-    }
-
-    return response.json();
-  },
-
-  async getCurrentUser() {
-    const token = localStorage.getItem('auth_token');
-    if (!token) return null;
-
-    const response = await fetch(`${API_URL}/auth/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        localStorage.removeItem('auth_token');
-        return null;
-      }
-      throw new Error('Failed to get user info');
     }
 
     return response.json();

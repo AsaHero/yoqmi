@@ -136,8 +136,8 @@ export function ShoppingProvider({ children }) {
     wsService.addHandler('itemDeleted', handleItemDeleted);
     wsService.addHandler('error', handleError);
 
-    // Connect with a temporary user ID (in real app, use actual user ID)
-    wsService.connect('temp-user-id');
+
+    wsService.connect();
 
     return () => {
       wsService.removeHandler('connectionChange', handleConnectionChange);
@@ -161,20 +161,15 @@ export function ShoppingProvider({ children }) {
       try {
         const newItem = {
           ...item,
-          id: Date.now().toString(),
           checked: false,
-          createdAt: new Date().toISOString(),
         };
 
-        dispatch({ type: ACTIONS.ADD_ITEM, payload: newItem });
+        const sent = wsService.sendCreateItem(newItem);
+        if (!sent) {
+          throw new Error('Failed to send item - connection lost');
+        }
 
-        // Sync with other clients
-        wsService.send({
-          type: 'ITEM_ADDED',
-          data: newItem,
-        });
-
-        return newItem;
+        return true;
       } catch (error) {
         dispatch({
           type: ACTIONS.SET_ERROR,
@@ -186,20 +181,13 @@ export function ShoppingProvider({ children }) {
 
     updateItem: async (item) => {
       try {
-        const updatedItem = {
-          ...item,
-          updatedAt: new Date().toISOString(),
-        };
+        const sent = wsService.sendUpdateItem(item);
+        if (!sent) {
+          throw new Error('Failed to send update - connection lost');
+        }
 
-        dispatch({ type: ACTIONS.UPDATE_ITEM, payload: updatedItem });
-
-        // Sync with other clients
-        wsService.send({
-          type: 'ITEM_UPDATED',
-          data: updatedItem,
-        });
-
-        return updatedItem;
+        // Wait for server confirmation via websocket
+        return true;
       } catch (error) {
         dispatch({
           type: ACTIONS.SET_ERROR,
@@ -211,13 +199,13 @@ export function ShoppingProvider({ children }) {
 
     deleteItem: async (id) => {
       try {
-        dispatch({ type: ACTIONS.DELETE_ITEM, payload: id });
+        const sent = wsService.sendDeleteItem(id);
+        if (!sent) {
+          throw new Error('Failed to send delete - connection lost');
+        }
 
-        // Sync with other clients
-        wsService.send({
-          type: 'ITEM_DELETED',
-          data: id,
-        });
+        // Wait for server confirmation via websocket
+        return true;
       } catch (error) {
         dispatch({
           type: ACTIONS.SET_ERROR,
@@ -232,13 +220,7 @@ export function ShoppingProvider({ children }) {
         const item = state.items.find(i => i.id === id);
         if (item) {
           const updatedItem = { ...item, checked: !item.checked };
-          dispatch({ type: ACTIONS.UPDATE_ITEM, payload: updatedItem });
-
-          // Sync with other clients
-          wsService.send({
-            type: 'ITEM_UPDATED',
-            data: updatedItem,
-          });
+          return await actions.updateItem(updatedItem);
         }
       } catch (error) {
         dispatch({

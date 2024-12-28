@@ -40,7 +40,7 @@ const JoinFamily = () => {
         setFamilyInfo(info);
 
         // If user is already in the family, redirect
-        if (info.userInFamily) {
+        if (info.user_in_family) {
           addNotification({
             type: 'info',
             message: t('auth.alreadyInFamily')
@@ -146,7 +146,7 @@ const JoinFamily = () => {
               {t('auth.joiningAs', { name: user.name })}
             </p>
             <p className="mt-1 text-gray-600 dark:text-gray-400">
-              {t('auth.joiningFamily', { name: familyInfo?.familyName })}
+              {t('auth.joiningFamily', { name: familyInfo.family_name })}
             </p>
           </div>
 
@@ -176,7 +176,7 @@ const JoinFamily = () => {
           {t('auth.joinFamily')}
         </h1>
         <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-          {t('auth.joiningFamily', { name: familyInfo?.familyName })}
+          {t('auth.joiningFamily', { name: familyInfo.family_name })}
         </p>
       </div>
 

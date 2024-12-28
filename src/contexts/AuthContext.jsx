@@ -1,6 +1,7 @@
 // src/contexts/AuthContext.jsx
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { authService } from '../services/authService';
+import { userService } from '../services/userService';
 
 const AuthContext = createContext(null);
 
@@ -70,7 +71,7 @@ export function AuthProvider({ children }) {
 
   const loadUser = async () => {
     try {
-      const user = await authService.getCurrentUser();
+      const user = await userService.getProfile();
       dispatch({ type: ACTIONS.SET_USER, payload: user });
     } catch (error) {
       dispatch({ type: ACTIONS.SET_ERROR, payload: error.message });
@@ -105,10 +106,10 @@ export function AuthProvider({ children }) {
     try {
       dispatch({ type: ACTIONS.SET_LOADING, payload: true });
       console.log(data);
-      
+
       const response = await authService.joinFamily({
-        inviteCode: data.inviteCode,
-        ...(state.user ? { userId: state.user.id } : {
+        invite_code: data.inviteCode,
+        ...(state.user ? { user_id: state.user.id } : {
           name: data.name,
           email: data.email,
           password: data.password

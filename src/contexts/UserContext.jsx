@@ -16,6 +16,7 @@ const ACTIONS = {
 
 const initialState = {
     user: null,
+    familyId: null,
     preferences: {
         language: navigator.language.split('-')[0] || 'en',
         darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -29,14 +30,15 @@ function userReducer(state, action) {
         case ACTIONS.SET_USER:
             return {
                 ...state,
-                user: action.payload,
+                user: action.payload.user,
+                familyId: action.payload.family_id,
                 isLoading: false,
                 error: null,
             };
         case ACTIONS.UPDATE_USER:
             return {
                 ...state,
-                user: { ...state.user, ...action.payload },
+                user: { ...state.user, ...action.payload.user },
                 isLoading: false,
                 error: null,
             };

@@ -1,13 +1,12 @@
 // src/services/familyService.js
 import { authService } from './authService';
-
-const API_URL = 'http://localhost:8080/api';
+import { Config } from './config';
 
 export const familyService = {
     // Get all family members
     async getMembers() {
         const token = authService.getToken();
-        const response = await fetch(`${API_URL}/family/members`, {
+        const response = await fetch(`${Config.API_URL}/family/members`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -21,7 +20,7 @@ export const familyService = {
     // Create new invite
     async createInvite() {
         const token = authService.getToken();
-        const response = await fetch(`${API_URL}/family/invite`, {
+        const response = await fetch(`${Config.API_URL}/family/invite`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,7 +36,7 @@ export const familyService = {
     // Remove member
     async removeMember(memberId) {
         const token = authService.getToken();
-        const response = await fetch(`${API_URL}/family/members/${memberId}`, {
+        const response = await fetch(`${Config.API_URL}/family/members/${memberId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -51,7 +50,7 @@ export const familyService = {
     // Update member role
     async updateMemberRole(memberId, role) {
         const token = authService.getToken();
-        const response = await fetch(`${API_URL}/family/members/${memberId}/role`, {
+        const response = await fetch(`${Config.API_URL}/family/members/${memberId}/role`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

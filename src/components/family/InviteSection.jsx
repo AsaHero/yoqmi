@@ -79,7 +79,7 @@ const InviteSection = () => {
 
         {inviteData && !isGenerating && (
           <>
-            <QRCode value={inviteData.inviteUrl} />
+            <QRCode value={inviteData.invite_url} />
 
             <div className="mt-6 w-full">
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">
@@ -87,12 +87,12 @@ const InviteSection = () => {
               </p>
               <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded-lg">
                 <code className="flex-1 text-sm text-gray-600 dark:text-gray-300 break-all">
-                  {inviteData.inviteUrl}
+                  {inviteData.invite_url}
                 </code>
               </div>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 text-center">
                 {t('family.inviteExpires', {
-                  time: new Date(inviteData.expiresAt).toLocaleString()
+                  time: new Date(inviteData.expires_at).toLocaleString()
                 })}
               </p>
             </div>
